@@ -4,38 +4,50 @@ from sqlalchemy import (
     Integer,
     Text,
     Date,
+    ForeignKey,
 )
+
+from sqlalchemy.orm import relationship
 
 from .meta import Base
 
-from datetime import datetime
-
-# class TestModel(Base):
-#     __tablename__ = 'test_table'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(Text)
-#     value = Column(Integer)
-#     date = Column(DateTime, default=datetime.now())
-
-# Index('test_index', TestModel.name, unique=True, mysql_length=255)
-
-
-# class TestModel2(Base):
-#     __tablename__ = 'test_table2'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(Text)
-#     value = Column(Integer)
-#     date = Column(DateTime, default=datetime.now())
-
-# Index('test2_index', TestModel2.name, unique=True, mysql_length=255)
-
-class Users(Base):
-    __tablename__ = 'users'
+class Listeners(Base):
+    __tablename__ = 'listeners'
     id = Column(Integer, primary_key=True)
-    login = Column(Text)
-    uuid = Column(Text)
+    uuid = Column(Text, unique=True)
+    access = relationship('IcecastAccess')
+    active_listeners = relationship('ActiveListeners')
 
-class Access(Base):
-    __tablename__ = 'access'
+    def accessParams(self):
+        if len(self.access) != 1:
+            #TODO dodac log z liczba accessow
+            return None
+        return self.access[0]
+
+    def countActiveListeners(self):
+        return len(self.active_listeners)
+
+# Index('listeners_index', Listeners.id, unique=True, mysql_length=255)
+
+
+class IcecastAccess(Base):
+    __tablename__ = 'icecast_access'
     id = Column(Integer, primary_key=True)
-    exp_date = Column(Date)
+    listener_id = Column(Integer, ForeignKey('listeners.id'), unique=True)  
+    max_listeners = Column(Integer)
+    expiration_date = Column(Date)
+
+
+#  Index('icecast_access_index', IcecastAccess.listener_id,
+#        unique=True, mysql_length=255)
+
+
+class ActiveListeners(Base):
+    __tablename__ = 'active_listeners'
+    id = Column(Integer, primary_key=True)
+    listener_id = Column(Integer, ForeignKey('listeners.id'), unique=True)
+    listener_ip = Column(Text)
+    # listener_mac = Column(Text) #zoabczyc czy da sie w ogole wydobyc i ew dorobic mechanizm do banowania 
+
+# Index('icecast_access_index', ActiveListeners.listener_id,
+#        unique=True, mysql_length=255)

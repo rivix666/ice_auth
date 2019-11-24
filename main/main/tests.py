@@ -51,16 +51,16 @@ class TestMyViewSuccessCondition(BaseTest):
         # model = MyModel(name='one', value=55)
         # self.session.add(model)
 
-    def test_passing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info['one'].name, 'one')
-        self.assertEqual(info['project'], 'ice_auth')
+    # def test_passing_view(self):
+    #     from .views.default import my_view
+    #     info = my_view(dummy_request(self.session))
+    #     self.assertEqual(info['one'].name, 'one')
+    #     self.assertEqual(info['project'], 'ice_auth')
 
 
-class TestMyViewFailureCondition(BaseTest):
+# class TestMyViewFailureCondition(BaseTest):
 
-    def test_failing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info.status_int, 500)
+    # def test_failing_view(self):
+    #     from .views.default import my_view
+    #     info = my_view(dummy_request(self.session))
+    #     self.assertEqual(info.status_int, 500)
