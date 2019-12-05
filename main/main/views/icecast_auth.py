@@ -51,7 +51,7 @@ class ListenerAuthView:
 
         # Check if user is not already connected
         if listener.countActiveListeners() >= access.max_listeners:
-            print(5)
+            print(listener.countActiveListeners())
             return HTTPFound(location = '/')
 
         # Add user to active_listeners table
@@ -92,7 +92,7 @@ class ListenerAuthView:
             # moze dorobic tabele ktora by trzymala ip wykorzystywane przez usera i ew z tamtad je wywalac a jak nie bedzie
             # takiego ip tam to trudno
             #listener_to_remove = query.filter(models.ActiveListeners.listener_ip == self.request.remote_addr).first()
-            
+
         except DBAPIError:
             print(1)
             return Response(status_int = 502)
