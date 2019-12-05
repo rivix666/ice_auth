@@ -4,7 +4,7 @@ from sentry_sdk.integrations.pyramid import PyramidIntegration
 from pyramid.config import Configurator
 
 def main(global_config, **settings):
-    """ Comment
+    """ Connect to sentry
     """
     sentry_sdk.init(
         dsn="https://9fe237b050b645349c72dda7adbd10f5@sentry.io/1845128",

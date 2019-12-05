@@ -1,73 +1,81 @@
-from pyramid.view import view_config, view_defaults
+from pyramid.view import view_config
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
+import pyramid.httpexceptions as exc
 
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.sql.expression import insert
 
 from datetime import datetime
-from parse import parse
 
-from .. import models
-
-import socket
-
-from sentry_sdk import capture_exception
-from sentry_sdk import capture_message
-
-import logging
-
-# TODO! Add loggs
-
+from main import models
+from main.utils import logs
 
 class ListenerMgr:
     def __init__(self, request):
         self.request = request
 
-    # Add ne listeners into database ()
-    @view_config(route_name = 'icecast_listener_new', request_method = 'POST')
-    def listener_add(self):
-        log = logging.getLogger(__name__)
-        log.debug('test log')
+    # Add new listener into database
+    #---------------------------------------------------------------------------------------------------
+    @view_config(route_name = 'icecast_listener_register', request_method = 'POST')
+    def listener_new(self):
+        log = logs.ice_log(__name__, self.request)
 
-        capture_message("test")
+        #TODO add maybe some sort of authentication between wordpress and this
 
-        # Try to get mount data from POST
+        # Try to get listener data from POST
         try:
             new_user_uuid = self.request.params['uuid']
             new_user_exp_date = self.request.params['exp_date']
             new_user_licences_num = self.request.params['licences_num']
-        except KeyError:
-            print("O MAMUSIU!!")
-            capture_exception()
-            return Response(status_int = 500) #zamienic na jakis kod bledu, dodac log
+        except KeyError as e:
+            log.critical('Wrong POST {}'.format(e))
+            raise e
 
-        # ssprawdzamy czy listenera czasem nie ma już w bazie
-        try:
-            query = self.request.dbsession.query(models.Listeners)
-            listener = query.filter(models.Listeners.uuid == new_user_uuid).first()
-        except DBAPIError:
-            print('KEKE')
-            return HTTPFound(location = '/') #zamienic na jakis kod bledu, dodac log
-        
+        # Check if there is no already registered listener with given uuid
+        query = self.request.dbsession.query(models.Listeners)
+        listener = query.filter(models.Listeners.uuid == new_user_uuid).first()
         if listener:
-            print("hołhołhoł")
-            return HTTPFound(location = '/') #zamienic na jakis kod bledu, dodac log
+            log.critical('Someone tries to register listener that already exists (id {}) (uuid {})'.format(listener.id, listener.uuid), True)
+            raise exc.HTTPInternalServerError()
 
-        # dodajemy listenera
-        try:
-            new_listener = models.Listeners(uuid = new_user_uuid)
-            self.request.dbsession.add(new_listener)
-            self.request.dbsession.flush() # this flush needs to be here, cause we want to use auto incremented id as listener_id below
+        # Add new listener  
+        new_listener = models.Listeners(uuid = new_user_uuid)
+        self.request.dbsession.add(new_listener)
+        self.request.dbsession.flush() # this flush needs to be here, cause we want to use auto incremented id as listener_id below
 
-            new_listener_access = models.IcecastAccess(listener_id = new_listener.id
-            , max_listeners = new_user_licences_num
-            , expiration_date = datetime.strptime(new_user_exp_date, '%Y-%m-%d'))
-            self.request.dbsession.add(new_listener_access)
-        except DBAPIError:
-            print("ojnonono")
-            return HTTPFound(location = '/') #zamienic na jakis kod bledu, dodac log
+        new_listener_access = models.IcecastAccess(listener_id = new_listener.id
+                                                    , max_listeners = new_user_licences_num
+                                                    , expiration_date = datetime.strptime(new_user_exp_date, '%Y-%m-%d'))
+        self.request.dbsession.add(new_listener_access)
 
+        log.info('Listener with id {} registered'.format(new_listener.id)) 
         return Response(status_int = 200)
-        
+
+    # Remove listener from database
+    #---------------------------------------------------------------------------------------------------
+    @view_config(route_name = 'icecast_listener_unregister', request_method = 'POST')
+    def listener_delete(self):
+        log = logs.ice_log(__name__, self.request)
+
+        #TODO add maybe some sort of authentication between wordpress and this
+
+        # Try to get listener data from POST
+        try:
+            new_user_uuid = self.request.params['uuid']
+        except KeyError as e:
+            log.critical('Wrong POST {}'.format(e))
+            raise e
+
+        # Check if listener with given uuid exists
+        query = self.request.dbsession.query(models.Listeners)
+        listener = query.filter(models.Listeners.uuid == new_user_uuid).first()
+        if not listener:
+            log.critical('Someone tries to unregister listener that not exists (uuid {})'.format(new_user_uuid), True)
+            raise exc.HTTPInternalServerError()
+
+        # Delete listener 
+        listener_id = listener.id
+        self.request.dbsession.delete(listener)   
+        log.info('Listener with id {} unregistered'.format(listener_id)) 
+        return Response(status_int = 200)

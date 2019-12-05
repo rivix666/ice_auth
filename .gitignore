@@ -106,3 +106,4 @@ venv.bak/
 # maine
 logs
 *.sqlite
+.vscode

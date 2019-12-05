@@ -30,7 +30,7 @@ tests_require = [
 
 setup(
     name='main',
-    version='0.0',
+    version='0.2',
     description='ice_auth',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
