@@ -46,7 +46,15 @@ class ActiveListeners(Base):
     __tablename__ = 'active_listeners'
     id = Column(Integer, primary_key=True)
     listener_id = Column(Integer, ForeignKey('listeners.id'), unique=True)
+    addresses = relationship('ListenersAddresses')
+
+
+class ListenersAddresses(Base):
+    __tablename__ = 'listeners_addresses'
+    id = Column(Integer, primary_key=True)
+    listener_id = Column(Integer, ForeignKey('active_listeners.id'), unique=True)  
     listener_ip = Column(Text)
+    active_listeners = relationship('ActiveListeners')
     # listener_mac = Column(Text) #zoabczyc czy da sie w ogole wydobyc i ew dorobic mechanizm do banowania 
 
 # Index('icecast_access_index', ActiveListeners.listener_id,
