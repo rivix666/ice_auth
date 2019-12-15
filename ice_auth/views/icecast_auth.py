@@ -9,8 +9,8 @@ from sqlalchemy.sql.expression import insert
 from datetime import datetime
 from parse import parse
 
-from main import models
-from main.utils import logs
+from ice_auth import models
+from ice_auth.utils import logs
 
 class ListenerAuthView:
     def __init__(self, request):

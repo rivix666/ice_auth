@@ -29,8 +29,8 @@ tests_require = [
 ]
 
 setup(
-    name='main',
-    version='0.2',
+    name='ice_auth',
+    version='0.3',
     description='ice_auth',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
@@ -52,10 +52,10 @@ setup(
     install_requires=requires,
     entry_points={
         'paste.app_factory': [
-            'main = main:main',
+            'main = ice_auth:main',
         ],
         'console_scripts': [
-            'initialize_main_db=main.scripts.initialize_db:main',
+            'initialize_ice_auth_db=ice_auth.scripts.initialize_db:main',
         ],
     },
 )

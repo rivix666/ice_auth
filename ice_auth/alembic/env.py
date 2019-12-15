@@ -3,7 +3,7 @@ from alembic import context
 from pyramid.paster import get_appsettings, setup_logging
 from sqlalchemy import engine_from_config
 
-from main.models.meta import Base
+from ice_auth.models.meta import Base
 
 config = context.config
 

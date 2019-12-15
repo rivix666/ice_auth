@@ -4,7 +4,7 @@ import sys
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy.exc import OperationalError
 
-from main import models
+from ice_auth import models
 
 
 def setup_models(dbsession):
@@ -25,7 +25,7 @@ def parse_args(argv):
     return parser.parse_args(argv[1:])
 
 
-def main(argv=sys.argv):
+def ice_auth(argv=sys.argv):
     args = parse_args(argv)
     setup_logging(args.config_uri)
     env = bootstrap(args.config_uri)

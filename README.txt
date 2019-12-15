@@ -6,7 +6,7 @@ Getting Started
 
 - Change directory into your newly created project.
 
-    cd main
+    cd ice_auth
 
 - Create a Python virtual environment.
 
@@ -32,7 +32,7 @@ Getting Started
 
 - Load default data into the database using a script.
 
-    env/bin/initialize_main_db development.ini
+    env/bin/initialize_ice_auth_db development.ini
 
 - Run your project's tests.
 

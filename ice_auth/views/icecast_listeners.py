@@ -8,8 +8,8 @@ from sqlalchemy.sql.expression import insert
 
 from datetime import datetime
 
-from main import models
-from main.utils import logs
+from ice_auth import models
+from ice_auth.utils import logs
 
 class ListenerMgr:
     def __init__(self, request):
