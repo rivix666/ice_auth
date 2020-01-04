@@ -20,6 +20,9 @@ requires = [
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
+    'sentry-sdk',
+    'parse',
+    'uwsgi',
 ]
 
 tests_require = [
