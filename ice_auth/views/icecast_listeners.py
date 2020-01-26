@@ -37,7 +37,7 @@ class ListenerMgr:
         listener = query.filter(models.Listeners.uuid == new_user_uuid).first()
         if listener:
             log.critical('Someone tries to register listener that already exists (id {}) (uuid {})'.format(listener.id, listener.uuid), True)
-            raise exc.HTTPInternalServerError()
+            return Response(status_int = 234)
 
         # Add new listener  
         new_listener = models.Listeners(uuid = new_user_uuid)
