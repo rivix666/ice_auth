@@ -36,8 +36,8 @@ class ListenerMgr:
         query = self.request.dbsession.query(models.Listeners)
         listener = query.filter(models.Listeners.uuid == new_user_uuid).first()
         if listener:
-            log.critical('Someone tries to register listener that already exists (id {}) (uuid {})'.format(listener.id, listener.uuid), True)
-            return Response(status_int = 234)
+            # log.critical('Someone tries to register listener that already exists (id {}) (uuid {})'.format(listener.id, listener.uuid), True)
+            return Response(status_int = 234) # 234 means that user was skipped 
 
         # Add new listener  
         new_listener = models.Listeners(uuid = new_user_uuid)
